@@ -1,5 +1,4 @@
-﻿using LimpseApi.DTO;
-using LimpseApi.Models;
+﻿using LimpseApi.Models;
 using LimpseApi.Models.Ser;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -10,37 +9,48 @@ using System.Threading.Tasks;
 
 namespace LimpseApi.Data
 {
-    public class ServiciosRepository
+    public class TelefonosClienteRepository
     {
+
         private readonly string _connectionString;
 
-        public ServiciosRepository(IConfiguration configuration)
+        public TelefonosClienteRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("LimpseDataBase");
         }
 
-        public async Task<List<ServicioDTO>> GetAll()
+        private TELEFONOS_CLIENTES MapToValue(SqlDataReader reader)
+        {
+            return new TELEFONOS_CLIENTES()
+            {
+                IdTelefonoCliente = (int)reader["IdTelefonoCliente"],
+                IdCliente = (int)reader["IdCliente"],
+                IdTipoTelefono = (int)reader["IdTipoTelefono"],
+                Telefono = reader["Telefono"].ToString()
+            };
+        }
+
+        public async Task<List<TELEFONOS_CLIENTES>> GetById(int id)
         {
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(_connectionString))
                 {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarServicios", sqlConn))
+                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarTelefonosCliente", sqlConn))
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        var response = new List<ServicioDTO>();
+                        sqlCmd.Parameters.AddWithValue("@p_IdCliente", id);
+                        var response = new List<TELEFONOS_CLIENTES>();
                         await sqlConn.OpenAsync();
 
                         using (var reader = await sqlCmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
-                                response.Add(MapToValueDTO(reader));
+                                response.Add(MapToValue(reader));
                             }
                         }
-
                         return response;
-
                     }
                 }
             }
@@ -50,76 +60,21 @@ namespace LimpseApi.Data
             }
         }
 
-        private ServicioDTO MapToValueDTO(SqlDataReader reader)
-        {
-            return new ServicioDTO()
-            {
-                IdServicio = (int)reader["IdServicio"],
-                IdTipoServicio = (int)reader["IdTipoServicio"],
-                Servicio = reader["Servicio"].ToString(),
-                Activo = (bool)reader["Activo"],
-                TipoServicio = reader["TipoServicio"].ToString()
-            };
-        }
-
-        private SERVICIOS MapToValue(SqlDataReader reader)
-        {
-            return new SERVICIOS()
-            {
-                IdServicio = (int)reader["IdServicio"],
-                IdTipoServicio = (int)reader["IdTipoServicio"],
-                Servicio = reader["Servicio"].ToString(),
-                Activo = (bool)reader["Activo"]
-            };
-        }
-
-        public async Task<SERVICIOS> GetById(int id)
+        public async Task<ResultadoSP> Abc(int accion, string usuario, TELEFONOS_CLIENTES telefonoCliente)
         {
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(_connectionString))
                 {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarServicios", sqlConn))
-                    {
-                        sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        sqlCmd.Parameters.AddWithValue("@p_IdServicio", id);
-                        var response = new SERVICIOS();
-                        await sqlConn.OpenAsync();
-
-                        using (var reader = await sqlCmd.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                response = MapToValue(reader);
-                            }
-                        }
-
-                        return response;
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public async Task<ResultadoSP> Abc(int accion, string usuario, SERVICIOS servicio)
-        {
-            try
-            {
-                using (SqlConnection sqlConn = new SqlConnection(_connectionString))
-                {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.Abc_Servicios", sqlConn))
+                    using (SqlCommand sqlCmd = new SqlCommand("Ser.Abc_TelefonosClientes", sqlConn))
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         sqlCmd.Parameters.AddWithValue("@p_Accion", accion);
-                        sqlCmd.Parameters.AddWithValue("@p_IdServicio", servicio.IdServicio);
-                        sqlCmd.Parameters.AddWithValue("@p_IdTipoServicio", servicio.IdTipoServicio);
-                        sqlCmd.Parameters.AddWithValue("@p_Servicio", servicio.Servicio);
-                        sqlCmd.Parameters.AddWithValue("@p_Activo", servicio.Activo);
+                        sqlCmd.Parameters.AddWithValue("@p_IdTelefonoCliente", telefonoCliente.IdTelefonoCliente);
+                        sqlCmd.Parameters.AddWithValue("@p_IdCliente", telefonoCliente.IdCliente);
+                        sqlCmd.Parameters.AddWithValue("@p_IdTipoTelefono", telefonoCliente.IdTipoTelefono);
+                        sqlCmd.Parameters.AddWithValue("@p_Telefono", telefonoCliente.Telefono);
                         sqlCmd.Parameters.AddWithValue("@p_Usuario", usuario);
 
                         await sqlConn.OpenAsync();

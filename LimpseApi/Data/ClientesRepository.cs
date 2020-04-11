@@ -1,5 +1,4 @@
-﻿using LimpseApi.DTO;
-using LimpseApi.Models;
+﻿using LimpseApi.Models;
 using LimpseApi.Models.Ser;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -10,32 +9,32 @@ using System.Threading.Tasks;
 
 namespace LimpseApi.Data
 {
-    public class ServiciosRepository
+    public class ClientesRepository
     {
         private readonly string _connectionString;
 
-        public ServiciosRepository(IConfiguration configuration)
+        public ClientesRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("LimpseDataBase");
         }
 
-        public async Task<List<ServicioDTO>> GetAll()
+        public async Task<List<CLIENTES>> GetAll()
         {
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(_connectionString))
                 {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarServicios", sqlConn))
+                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarClientes", sqlConn))
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        var response = new List<ServicioDTO>();
+                        var response = new List<CLIENTES>();
                         await sqlConn.OpenAsync();
 
                         using (var reader = await sqlCmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
-                                response.Add(MapToValueDTO(reader));
+                                response.Add(MapToValue(reader));
                             }
                         }
 
@@ -50,40 +49,32 @@ namespace LimpseApi.Data
             }
         }
 
-        private ServicioDTO MapToValueDTO(SqlDataReader reader)
+        private CLIENTES MapToValue(SqlDataReader reader)
         {
-            return new ServicioDTO()
+            return new CLIENTES()
             {
-                IdServicio = (int)reader["IdServicio"],
-                IdTipoServicio = (int)reader["IdTipoServicio"],
-                Servicio = reader["Servicio"].ToString(),
-                Activo = (bool)reader["Activo"],
-                TipoServicio = reader["TipoServicio"].ToString()
-            };
-        }
-
-        private SERVICIOS MapToValue(SqlDataReader reader)
-        {
-            return new SERVICIOS()
-            {
-                IdServicio = (int)reader["IdServicio"],
-                IdTipoServicio = (int)reader["IdTipoServicio"],
-                Servicio = reader["Servicio"].ToString(),
+                IdCliente = (int)reader["IdCliente"],
+                RFC = reader["RFC"].ToString(),
+                RazonSocial = reader["RazonSocial"].ToString(),
+                Nombres = reader["Nombres"].ToString(),
+                ApellidoPaterno = reader["ApellidoPaterno"].ToString(),
+                ApellidoMaterno = reader["ApellidoMaterno"].ToString(),
+                Email = reader["Email"].ToString(),
                 Activo = (bool)reader["Activo"]
             };
         }
 
-        public async Task<SERVICIOS> GetById(int id)
+        public async Task<CLIENTES> GetById(int id)
         {
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(_connectionString))
                 {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarServicios", sqlConn))
+                    using (SqlCommand sqlCmd = new SqlCommand("Ser.prConsultarClientes", sqlConn))
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        sqlCmd.Parameters.AddWithValue("@p_IdServicio", id);
-                        var response = new SERVICIOS();
+                        sqlCmd.Parameters.AddWithValue("@p_IdCliente", id);
+                        var response = new CLIENTES();
                         await sqlConn.OpenAsync();
 
                         using (var reader = await sqlCmd.ExecuteReaderAsync())
@@ -105,21 +96,25 @@ namespace LimpseApi.Data
             }
         }
 
-        public async Task<ResultadoSP> Abc(int accion, string usuario, SERVICIOS servicio)
+        public async Task<ResultadoSP> Abc(int accion, string usuario, CLIENTES cliente)
         {
             try
             {
                 using (SqlConnection sqlConn = new SqlConnection(_connectionString))
                 {
-                    using (SqlCommand sqlCmd = new SqlCommand("Ser.Abc_Servicios", sqlConn))
+                    using (SqlCommand sqlCmd = new SqlCommand("Ser.Abc_Clientes", sqlConn))
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         sqlCmd.Parameters.AddWithValue("@p_Accion", accion);
-                        sqlCmd.Parameters.AddWithValue("@p_IdServicio", servicio.IdServicio);
-                        sqlCmd.Parameters.AddWithValue("@p_IdTipoServicio", servicio.IdTipoServicio);
-                        sqlCmd.Parameters.AddWithValue("@p_Servicio", servicio.Servicio);
-                        sqlCmd.Parameters.AddWithValue("@p_Activo", servicio.Activo);
+                        sqlCmd.Parameters.AddWithValue("@p_IdCliente", cliente.IdCliente);
+                        sqlCmd.Parameters.AddWithValue("@p_RazonSocial", cliente.RazonSocial);
+                        sqlCmd.Parameters.AddWithValue("@p_Nombres", cliente.Nombres);
+                        sqlCmd.Parameters.AddWithValue("@p_ApellidoPaterno", cliente.ApellidoPaterno);
+                        sqlCmd.Parameters.AddWithValue("@p_ApellidiMaterno", cliente.ApellidoMaterno);
+                        sqlCmd.Parameters.AddWithValue("@p_RFC", cliente.RFC);
+                        sqlCmd.Parameters.AddWithValue("@p_Email", cliente.Email);
+                        sqlCmd.Parameters.AddWithValue("@p_Activo", cliente.Activo);
                         sqlCmd.Parameters.AddWithValue("@p_Usuario", usuario);
 
                         await sqlConn.OpenAsync();

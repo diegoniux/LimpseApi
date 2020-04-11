@@ -1,5 +1,4 @@
 ﻿using LimpseApi.Data;
-using LimpseApi.DTO;
 using LimpseApi.Models;
 using LimpseApi.Models.Ser;
 using Microsoft.AspNetCore.Mvc;
@@ -12,36 +11,17 @@ namespace LimpseApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServiciosController
+    public class DireccionesClienteController
     {
-        private readonly ServiciosRepository _repository;
+        private readonly DireccionesClienteRepository _repository;
 
-        public ServiciosController(ServiciosRepository repository)
+        public DireccionesClienteController(DireccionesClienteRepository repository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<ServicioDTO>>> Get()
-        {
-            try
-            {
-                return await _repository.GetAll();
-            }
-            catch (Exception ex)
-            {
-                return new OkObjectResult(new ResultadoSP()
-                {
-                    Result = 0,
-                    ErrorMessage = ex.Message,
-                    FriendlyMessage = "Error al obtener la información"
-                });
-            }
-            
-        }
-
         [HttpGet("{id}")]
-        public async Task<ActionResult< SERVICIOS>> Get(int id)
+        public async Task<ActionResult<List<DIRECCIONES_CLIENTES>>> Get(int id)
         {
             try
             {
@@ -56,15 +36,14 @@ namespace LimpseApi.Controllers
                     FriendlyMessage = "Error al obtener la información"
                 });
             }
-           
         }
 
         [HttpPost]
-        public async Task<ResultadoSP> Post([FromBody] SERVICIOS servicio)
+        public async Task<ResultadoSP> Post([FromBody] DIRECCIONES_CLIENTES direccionCliente)
         {
             try
             {
-                return await _repository.Abc(1, "diegoniux", servicio);
+                return await _repository.Abc(1, "diegoniux", direccionCliente);
             }
             catch (Exception ex)
             {
@@ -75,7 +54,6 @@ namespace LimpseApi.Controllers
                     FriendlyMessage = "Error al obtener la información"
                 };
             }
-            
         }
 
         [HttpDelete("{id}")]
@@ -83,7 +61,17 @@ namespace LimpseApi.Controllers
         {
             try
             {
-                return await _repository.Abc(2, "diegoniux", new SERVICIOS() { IdServicio = id, Servicio = ""});
+                return await _repository.Abc(2, "diegoniux", new DIRECCIONES_CLIENTES()
+                {
+                    IdDireccionCliente = id,
+                    Calle = "",
+                    NoExt = "",
+                    NoInt = "",
+                    Ciudad = "",
+                    Colonia = "",
+                    Estado = "",
+                    CP = ""
+                });
             }
             catch (Exception ex)
             {
@@ -94,15 +82,14 @@ namespace LimpseApi.Controllers
                     FriendlyMessage = "Error al obtener la información"
                 };
             }
-            
         }
 
         [HttpPut("{id}")]
-        public async Task<ResultadoSP> Put(int id, [FromBody] SERVICIOS servicio)
+        public async Task<ResultadoSP> Put(int id, [FromBody] DIRECCIONES_CLIENTES direccionCliente)
         {
             try
             {
-                return await _repository.Abc(3, "diegoniux", servicio);
+                return await _repository.Abc(3, "diegoniux", direccionCliente);
             }
             catch (Exception ex)
             {
@@ -113,7 +100,6 @@ namespace LimpseApi.Controllers
                     FriendlyMessage = "Error al obtener la información"
                 };
             }
-            
         }
     }
 }

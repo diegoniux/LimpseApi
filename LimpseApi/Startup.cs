@@ -26,12 +26,19 @@ namespace LimpseApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddScoped<TecnicosRepository>();
             services.AddScoped<ServiciosRepository>();
             services.AddScoped<MaterialesRepository>();
             services.AddScoped<KitsRepository>();
             services.AddScoped<ServiciosKitRepository>();
             services.AddScoped<MaterialesKitRepository>();
+            services.AddScoped<UsuariosRepository>();
+            services.AddScoped<LoginRepository>();
+            services.AddScoped<CatalogosRepository>();
+            services.AddScoped<ClientesRepository>();
+            services.AddScoped<TelefonosClienteRepository>();
+            services.AddScoped<DireccionesClienteRepository>();
 
             services.AddControllers();
         }
@@ -49,6 +56,8 @@ namespace LimpseApi
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200").WithHeaders("*").WithMethods("*"));
 
             app.UseEndpoints(endpoints =>
             {
