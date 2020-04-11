@@ -39,6 +39,8 @@ namespace LimpseApi
             services.AddScoped<ClientesRepository>();
             services.AddScoped<TelefonosClienteRepository>();
             services.AddScoped<DireccionesClienteRepository>();
+            services.AddScoped<PreciosServiciosRepository>();
+            services.AddScoped<PreciosMaterialesRepository>();
 
             services.AddControllers();
         }
