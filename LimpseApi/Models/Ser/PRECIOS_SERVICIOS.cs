@@ -15,5 +15,6 @@ namespace LimpseApi.Models.Ser
 		public decimal Precio { get; set; }
 		public DateTime FechaAlta { get; set; }
 		public DateTime FechaAplicacion { get; set; }
+		public bool Activo { get; set; }
 	}
 }
